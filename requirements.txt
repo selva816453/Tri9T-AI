@@ -1,0 +1,12 @@
+fastapi==0.161.1
+uvicorn==0.54.0
+sqlalchemy==2.1.6
+pydantic==2.14.1
+pymongo==4.19.0
+python-multipart==0.0.32
+httpx==0.28.1
+python-dotenv==1.2.4
+groq==1.7.0
+tiktoken==0.14.0
+pdfminer.six==20260107
+reportlab==5.1.0

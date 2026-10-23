@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CT-200 QA System — Dashboard</title>
+<style>
+/* ── Reset & Variables ─────────────────────────────────────────── */
+:root {
+  --bg:#0d1117; --card:#161b22; --card2:#1c2128; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --accent2:#388bfd;
+  --green:#3fb950; --red:#f85149; --yellow:#d29922; --purple:#bc8cff;
+  --orange:#e3b341; --teal:#39d353; --sidebar:200px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;overflow-x:hidden;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── Layout ────────────────────────────────────────────────────── */
+.shell{display:flex;min-height:100vh;}
+
+/* ── Sidebar ────────────────────────────────────────────────────── */
+.sidebar{
+  width:var(--sidebar);background:var(--card);border-right:1px solid var(--border);
+  padding:0;position:fixed;top:0;left:0;height:100vh;display:flex;
+  flex-direction:column;z-index:100;
+}
+.logo{
+  padding:20px 18px 16px;border-bottom:1px solid var(--border);
+  font-size:12px;font-weight:700;letter-spacing:.5px;
+}
+.logo-main{font-size:17px;color:var(--text);display:block;margin-bottom:2px;}
+.logo-sub{color:var(--muted);font-size:11px;}
+.logo-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--green);margin-right:6px;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3};}
+
+nav{flex:1;padding:12px 8px;overflow-y:auto;}
+.nav-group-label{font-size:10px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1px;padding:12px 10px 6px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px;
+  border:none;background:none;width:100%;text-align:left;transition:all .15s;
+  margin-bottom:2px;
+}
+.nav-item:hover{background:rgba(88,166,255,.08);color:var(--text);}
+.nav-item.active{background:rgba(88,166,255,.12);color:var(--accent);font-weight:600;}
+.nav-icon{font-size:15px;width:18px;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#000;
+  font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;}
+
+.sidebar-footer{
+  padding:14px 16px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--muted);line-height:1.6;
+}
+
+/* ── Main ───────────────────────────────────────────────────────── */
+.main{margin-left:var(--sidebar);flex:1;padding:28px 32px;max-width:1200px;}
+
+/* ── Top bar ──────────────────────────────────────────────────── */
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:28px;
+}
+.topbar h1{font-size:20px;font-weight:700;}
+.topbar-right{display:flex;gap:10px;align-items:center;}
+.doc-selector{
+  background:var(--card);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;outline:none;
+}
+.btn{
+  border:1px solid var(--border);background:var(--card2);color:var(--text);
+  border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:all .15s;
+}
+.btn:hover{background:rgba(255,255,255,.06);border-color:var(--muted);}
+.btn-primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2);}
+.btn-danger{background:rgba(248,81,73,.1);color:var(--red);border-color:rgba(248,81,73,.3);}
+
+/* ── Pages ─────────────────────────────────────────────────────── */
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ── Section header ──────────────────────────────────────────── */
+.section-header{margin-bottom:20px;}
+.section-header h2{font-size:18px;font-weight:700;margin-bottom:4px;}
+.section-header p{color:var(--muted);font-size:13px;}
+
+/* ── Stats grid ─────────────────────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;position:relative;overflow:hidden;
+}
+.stat::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--c1,var(--accent)),var(--c2,transparent));
+}
+.stat-icon{font-size:22px;margin-bottom:10px;}
+.stat-value{font-size:26px;font-weight:800;line-height:1;}
+.stat-label{color:var(--muted);font-size:12px;margin-top:6px;}
+.stat-change{font-size:11px;margin-top:4px;}
+
+/* ── Cards ──────────────────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+
+/* ── Badges ──────────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-green{background:rgba(63,185,80,.15);color:var(--green);}
+.badge-red{background:rgba(248,81,73,.15);color:var(--red);}
+.badge-blue{background:rgba(88,166,255,.15);color:var(--accent);}
+.badge-yellow{background:rgba(210,153,34,.15);color:var(--yellow);}
+.badge-purple{background:rgba(188,140,255,.15);color:var(--purple);}
+.badge-orange{background:rgba(227,179,65,.15);color:var(--orange);}
+
+/* ── Version cards ───────────────────────────────────────────── */
+.versions-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.version-card{
+  background:var(--card2);border:1px solid var(--border);border-radius:12px;
+  padding:20px;transition:all .2s;cursor:default;
+}
+.version-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.version-card.latest{border-color:rgba(63,185,80,.4);}
+.vc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.vc-ver{font-size:28px;font-weight:800;}
+.vc-filename{color:var(--muted);font-size:12px;margin-top:4px;}
+.vc-stats{display:flex;gap:16px;margin-top:14px;}
+.vc-stat{text-align:center;}
+.vc-stat-val{font-size:18px;font-weight:700;color:var(--accent);}
+.vc-stat-lbl{font-size:11px;color:var(--muted);}
+.vc-date{font-size:11px;color:var(--muted);margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+
+/* ── Node tree ───────────────────────────────────────────────── */
+.tree-controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-btn{
+  background:var(--card2);border:1px solid var(--border);color:var(--muted);
+  border-radius:20px;padding:5px 14px;font-size:12px;cursor:pointer;transition:all .15s;
+}
+.filter-btn:hover,.filter-btn.active{background:rgba(88,166,255,.1);border-color:var(--accent);color:var(--accent);}
+
+.node{
+  border:1px solid var(--border);border-radius:10px;margin-bottom:8px;
+  overflow:hidden;transition:border-color .15s;
+}
+.node:hover{border-color:rgba(88,166,255,.4);}
+.node-head{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;
+  background:var(--card2);transition:background .15s;
+}
+.node-head:hover{background:rgba(88,166,255,.05);}
+.node-level{
+  width:22px;height:22px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;
+}
+.l1{background:rgba(88,166,255,.2);color:var(--accent);}
+.l2{background:rgba(188,140,255,.2);color:var(--purple);}
+.l3{background:rgba(63,185,80,.2);color:var(--green);}
+.node-title{font-weight:600;font-size:13px;flex:1;}
+.node-meta{color:var(--muted);font-size:11px;margin-left:auto;display:flex;gap:10px;align-items:center;}
+.expand-icon{color:var(--muted);font-size:12px;transition:transform .2s;}
+.node.open .expand-icon{transform:rotate(90deg);}
+.node-body{display:none;padding:14px 16px;border-top:1px solid var(--border);background:var(--card);}
+.node.open .node-body{display:block;}
+.body-text{font-size:13px;line-height:1.8;color:var(--muted);margin-bottom:12px;}
+.children-list{margin-top:10px;}
+.child-item{
+  padding:7px 12px;border-radius:7px;border:1px solid var(--border);
+  margin-bottom:5px;font-size:12px;color:var(--muted);background:var(--card2);
+  display:flex;justify-content:space-between;
+}
+.hash-tag{font-family:monospace;font-size:10px;color:var(--muted);margin-top:8px;}
+
+/* ── Search ──────────────────────────────────────────────────── */
+.search-wrap{position:relative;margin-bottom:20px;}
+.search-input{
+  width:100%;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:12px 50px 12px 18px;color:var(--text);
+  font-size:14px;outline:none;transition:border-color .15s;
+}
+.search-input:focus{border-color:var(--accent);}
+.search-go{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:var(--accent);color:#000;border:none;border-radius:7px;
+  padding:6px 12px;font-weight:700;cursor:pointer;font-size:13px;
+}
+.quick-searches{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.quick-chip{
+  background:var(--card2);border:1px solid var(--border);color:var(--muted);
+  border-radius:20px;padding:5px 14px;font-size:12px;cursor:pointer;transition:all .15s;
+}
+.quick-chip:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── Test Cases ──────────────────────────────────────────────── */
+.gen-header{
+  background:var(--card2);border:1px solid var(--border);border-radius:12px;
+  padding:16px 20px;margin-bottom:16px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.stale-banner{
+  background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.25);
+  border-radius:10px;padding:14px 18px;margin-bottom:16px;
+}
+.stale-banner-title{color:var(--red);font-weight:700;font-size:13px;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;}
+.stale-node-row{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:8px 0;border-bottom:1px solid rgba(248,81,73,.1);gap:12px;
+}
+.stale-node-row:last-child{border-bottom:none;}
+.diff-mono{
+  font-family:'Courier New',monospace;background:rgba(0,0,0,.4);
+  border-radius:6px;padding:10px;font-size:11px;white-space:pre-wrap;
+  margin-top:6px;line-height:1.6;
+}
+.diff-add{color:#3fb950;}
+.diff-rem{color:#f85149;}
+.diff-ctx{color:#8b949e;}
+
+.tc{background:var(--card2);border:1px solid var(--border);border-radius:10px;
+  margin-bottom:12px;overflow:hidden;}
+.tc-top{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 18px;cursor:pointer;transition:background .15s;
+}
+.tc-top:hover{background:rgba(255,255,255,.03);}
+.tc-id-badge{font-family:monospace;font-size:12px;color:var(--muted);margin-right:10px;}
+.tc-title-text{font-weight:600;font-size:14px;}
+.tc-detail{display:none;padding:0 18px 16px;}
+.tc.open .tc-detail{display:block;}
+.tc-section{margin-top:12px;}
+.tc-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:6px;}
+.tc-val{font-size:13px;line-height:1.7;color:var(--text);}
+.step-item{
+  display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.step-item:last-child{border-bottom:none;}
+.step-num{
+  width:22px;height:22px;border-radius:50%;background:rgba(88,166,255,.15);
+  color:var(--accent);font-size:11px;font-weight:700;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.expected-box{
+  background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);
+  border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);line-height:1.6;
+}
+
+/* ── Diff viewer ──────────────────────────────────────────────── */
+.diff-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;
+  margin-bottom:12px;overflow:hidden;}
+.diff-card-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;background:rgba(248,81,73,.06);border-bottom:1px solid rgba(248,81,73,.2);
+}
+.diff-card-head .heading{font-weight:600;font-size:13px;}
+.diff-block{padding:14px 16px;}
+
+/* ── Ingest panel ──────────────────────────────────────────────── */
+.ingest-form{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:24px;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;display:block;}
+.form-input{
+  width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:10px 14px;font-size:13px;outline:none;
+}
+.form-input:focus{border-color:var(--accent);}
+.file-drop{
+  border:2px dashed var(--border);border-radius:10px;padding:32px;
+  text-align:center;cursor:pointer;transition:all .2s;
+}
+.file-drop:hover,.file-drop.drag{border-color:var(--accent);background:rgba(88,166,255,.04);}
+.file-drop input{display:none;}
+.file-drop-icon{font-size:32px;margin-bottom:10px;}
+.file-drop-text{color:var(--muted);font-size:13px;}
+.file-drop-text span{color:var(--accent);cursor:pointer;}
+.file-chosen{margin-top:10px;font-size:12px;color:var(--green);}
+.ingest-log{
+  background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;
+  padding:14px;font-family:monospace;font-size:12px;height:160px;overflow-y:auto;
+  margin-top:14px;color:var(--green);line-height:1.8;display:none;
+}
+.log-line-err{color:var(--red);}
+.log-line-warn{color:var(--yellow);}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden;display:none;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));
+  width:0%;transition:width .4s;border-radius:2px;}
+
+/* ── Loading ──────────────────────────────────────────────────── */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-block{color:var(--muted);padding:40px;text-align:center;font-size:13px;}
+.empty-state{color:var(--muted);text-align:center;padding:40px;font-size:13px;}
+.empty-state .empty-icon{font-size:36px;margin-bottom:10px;}
+
+/* ── Toast ────────────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--card2);
+  border:1px solid var(--border);border-radius:10px;padding:14px 20px;
+  font-size:13px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);z-index:999;
+  transform:translateY(80px);opacity:0;transition:all .3s;max-width:360px;
+}
+.toast.show{transform:none;opacity:1;}
+.toast.success{border-color:rgba(63,185,80,.4);}
+.toast.error{border-color:rgba(248,81,73,.4);}
+
+/* ── Table ────────────────────────────────────────────────────── */
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.8px;padding:8px 12px;border-bottom:1px solid var(--border);}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);}
+
+/* ── Scrollable list ──────────────────────────────────────────── */
+.scroll-list{max-height:480px;overflow-y:auto;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+<!-- ═══════════════════════════════════ SIDEBAR ═════════════════ -->
+<aside class="sidebar">
+  <div class="logo">
+    <span class="logo-main"><span class="logo-dot"></span>CT-200 QA</span>
+    <span class="logo-sub">Tri9T AI · Medical Device QA</span>
+  </div>
+  <nav>
+    <div class="nav-group-label">Overview</div>
+    <button class="nav-item active" onclick="go('health')" id="nb-health">
+      <span class="nav-icon">💚</span>Health & Stats
+    </button>
+
+    <div class="nav-group-label">Document</div>
+    <button class="nav-item" onclick="go('versions')" id="nb-versions">
+      <span class="nav-icon">📦</span>Versions
+    </button>
+    <button class="nav-item" onclick="go('tree')" id="nb-tree">
+      <span class="nav-icon">🌲</span>Document Tree
+    </button>
+    <button class="nav-item" onclick="go('search')" id="nb-search">
+      <span class="nav-icon">🔍</span>Search
+    </button>
+
+    <div class="nav-group-label">QA Testing</div>
+    <button class="nav-item" onclick="go('testcases')" id="nb-testcases">
+      <span class="nav-icon">🤖</span>Test Cases
+    </button>
+    <button class="nav-item" onclick="go('staleness')" id="nb-staleness">
+      <span class="nav-icon">⚡</span>Staleness Diff
+    </button>
+
+    <div class="nav-group-label">Admin</div>
+    <button class="nav-item" onclick="go('ingest')" id="nb-ingest">
+      <span class="nav-icon">📥</span>Ingest PDF
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    FastAPI · SQLite · MongoDB<br/>
+    pdfminer · Groq LLM<br/>
+    <span id="sfver" style="color:var(--accent)">Loading…</span>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════ MAIN ════════════════════ -->
+<main class="main">
+
+<!-- Top bar -->
+<div class="topbar">
+  <h1 id="page-title">Health &amp; Stats</h1>
+  <div class="topbar-right">
+    <select class="doc-selector" id="doc-select" onchange="docChanged()">
+      <option value="CT200-MAN-001">CT200-MAN-001</option>
+    </select>
+    <button class="btn" onclick="refreshPage()">↺ Refresh</button>
+  </div>
+</div>
+
+<!-- ─────────────── PAGE: HEALTH ────────────────────────────── -->
+<div class="page active" id="pg-health">
+  <div class="stats-grid" id="stats-grid">
+    <div class="loading-block"><span class="spinner"></span> Loading…</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title">API Endpoints</span></div>
+      <table>
+        <thead><tr><th>Endpoint</th><th>Method</th><th>Status</th></tr></thead>
+        <tbody id="endpoint-table"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Recent Ingestions</span></div>
+      <div id="recent-versions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── PAGE: VERSIONS ──────────────────────────── -->
+<div class="page" id="pg-versions">
+  <div class="section-header">
+    <h2>Document Versions</h2>
+    <p>All ingested versions of the CT-200 manual. Each version is immutable once ingested.</p>
+  </div>
+  <div class="versions-grid" id="versions-grid">
+    <div class="loading-block"><span class="spinner"></span> Loading…</div>
+  </div>
+  <div class="card" style="margin-top:16px;" id="version-nodes-card" style="display:none">
+    <div class="card-header">
+      <span class="card-title" id="version-nodes-title">Nodes in version</span>
+      <span class="badge badge-blue" id="version-nodes-count"></span>
+    </div>
+    <div id="version-nodes-list"></div>
+  </div>
+</div>
+
+<!-- ─────────────── PAGE: TREE ──────────────────────────────── -->
+<div class="page" id="pg-tree">
+  <div class="section-header">
+    <h2>Document Tree</h2>
+    <p>Hierarchical structure of the CT-200 manual. Click any section to read the full content.</p>
+  </div>
+  <div class="tree-controls">
+    <span style="color:var(--muted);font-size:12px;margin-right:4px;">Filter:</span>
+    <button class="filter-btn active" onclick="filterTree('all',this)">All</button>
+    <button class="filter-btn" onclick="filterTree('1',this)">H1 Chapters</button>
+    <button class="filter-btn" onclick="filterTree('2',this)">H2 Sections</button>
+    <button class="filter-btn" onclick="filterTree('3',this)">H3 Sub-sections</button>
+    <select class="doc-selector" id="tree-ver" onchange="loadTree()" style="margin-left:auto">
+      <option value="">Latest</option>
+    </select>
+  </div>
+  <div id="tree-list"><div class="loading-block"><span class="spinner"></span> Loading…</div></div>
+</div>
+
+<!-- ─────────────── PAGE: SEARCH ────────────────────────────── -->
+<div class="page" id="pg-search">
+  <div class="section-header">
+    <h2>Search Document</h2>
+    <p>Full-text search across all headings and body content.</p>
+  </div>
+  <div class="search-wrap">
+    <input class="search-input" id="sq" type="text"
+      placeholder='Search sections… e.g. "pressurisation", "E3 error", "Bluetooth", "battery"'
+      onkeydown="if(event.key==='Enter') doSearch()"/>
+    <button class="search-go" onclick="doSearch()">→</button>
+  </div>
+  <div class="quick-searches">
+    <span style="color:var(--muted);font-size:12px;margin-right:4px;">Quick:</span>
+    <span class="quick-chip" onclick="qs('pressurisation')">pressurisation</span>
+    <span class="quick-chip" onclick="qs('E3')">Error E3</span>
+    <span class="quick-chip" onclick="qs('Bluetooth')">Bluetooth</span>
+    <span class="quick-chip" onclick="qs('battery')">battery</span>
+    <span class="quick-chip" onclick="qs('cuff')">cuff placement</span>
+    <span class="quick-chip" onclick="qs('calibration')">calibration</span>
+    <span class="quick-chip" onclick="qs('accuracy')">accuracy</span>
+  </div>
+  <div id="search-out"></div>
+</div>
+
+<!-- ─────────────── PAGE: TEST CASES ────────────────────────── -->
+<div class="page" id="pg-testcases">
+  <div class="section-header">
+    <h2>Generated Test Cases</h2>
+    <p>LLM-generated QA test cases. Red badge means the source document has changed — test case may be inaccurate.</p>
+  </div>
+  <div id="tc-out"><div class="loading-block"><span class="spinner"></span> Loading…</div></div>
+</div>
+
+<!-- ─────────────── PAGE: STALENESS ─────────────────────────── -->
+<div class="page" id="pg-staleness">
+  <div class="section-header">
+    <h2>Staleness Diff — v1 vs v2</h2>
+    <p>Sections that changed between version 1.0 and 2.0. These are the nodes that will trigger stale test case warnings.</p>
+  </div>
+  <div id="diff-out"><div class="loading-block"><span class="spinner"></span> Loading…</div></div>
+</div>
+
+<!-- ─────────────── PAGE: INGEST ────────────────────────────── -->
+<div class="page" id="pg-ingest">
+  <div class="section-header">
+    <h2>Ingest New PDF</h2>
+    <p>Upload a new version of the CT-200 manual. Each version is immutable — re-ingesting the same version tag is blocked.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div class="ingest-form">
+      <div class="form-group">
+        <label class="form-label">Document ID</label>
+        <input class="form-input" id="ing-doc" value="CT200-MAN-001"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Version Tag</label>
+        <input class="form-input" id="ing-ver" placeholder="e.g. 3.0"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PDF File</label>
+        <div class="file-drop" id="file-drop" onclick="document.getElementById('pdf-file').click()"
+          ondragover="event.preventDefault();this.classList.add('drag')"
+          ondragleave="this.classList.remove('drag')"
+          ondrop="handleDrop(event)">
+          <input type="file" id="pdf-file" accept=".pdf" onchange="fileChosen(this)"/>
+          <div class="file-drop-icon">📄</div>
+          <div class="file-drop-text">Drag & drop PDF or <span>click to browse</span></div>
+          <div class="file-chosen" id="file-chosen-name" style="display:none"></div>
+        </div>
+      </div>
+      <div class="progress-bar" id="ing-progress"><div class="progress-fill" id="ing-fill"></div></div>
+      <button class="btn btn-primary" style="margin-top:14px;width:100%;justify-content:center"
+        onclick="doIngest()">📥 Ingest Document</button>
+      <div class="ingest-log" id="ing-log"></div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">How ingestion works</span></div>
+        <div style="font-size:13px;color:var(--muted);line-height:2;">
+          1. PDF uploaded → parsed by pdfminer<br/>
+          2. Font sizes clustered → heading levels detected<br/>
+          3. Tree built → DocumentNode rows created<br/>
+          4. Nodes matched to previous version by <code style="color:var(--accent)">logical_id</code><br/>
+          5. Changed nodes flagged with <code style="color:var(--red)">diff_summary</code><br/>
+          6. NodeVersion bridge rows created<br/>
+          7. Old selections remain valid (version-pinned)
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="card-header"><span class="card-title">Ingested versions</span></div>
+        <div id="ing-ver-list"><div class="loading-block"><span class="spinner"></span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  Config
+// ══════════════════════════════════════════════════════════
+const B = '';
+let DOC = 'CT200-MAN-001';
+let currentPage = 'health';
+let allNodes = [];
+
+// ── Navigation ──────────────────────────────────────────────
+const PAGE_TITLES = {
+  health:'Health & Stats', versions:'Document Versions',
+  tree:'Document Tree', search:'Search', testcases:'Test Cases',
+  staleness:'Staleness Diff', ingest:'Ingest PDF'
+};
+
+function go(p) {
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('pg-'+p).classList.add('active');
+  document.getElementById('nb-'+p).classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_TITLES[p];
+  currentPage = p;
+  if(p==='health')    loadHealth();
+  if(p==='versions')  loadVersions();
+  if(p==='tree')      loadTree();
+  if(p==='testcases') loadTestCases();
+  if(p==='staleness') loadStaleness();
+  if(p==='ingest')    loadIngestVersions();
+}
+function refreshPage(){ go(currentPage); }
+function docChanged(){ DOC = document.getElementById('doc-select').value; refreshPage(); }
+
+// ── API ─────────────────────────────────────────────────────
+async function api(path) {
+  const r = await fetch(B+path);
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+// ── Toast ────────────────────────────────────────────────────
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = (type==='success'?'✓ ':'✗ ') + msg;
+  el.className = 'toast show '+type;
+  setTimeout(()=>el.classList.remove('show'), 3500);
+}
+
+// ══════════════════════════════════════════════════════════
+//  HEALTH
+// ══════════════════════════════════════════════════════════
+async function loadHealth() {
+  try {
+    const [h, vers] = await Promise.all([
+      api('/health'),
+      api('/api/versions?document_id='+DOC)
+    ]);
+    const totalNodes = vers.reduce((s,v)=>s+v.node_count,0);
+    const changedNodes = vers.length>1 ? 'v1→v2 diff available' : 'Only 1 version';
+
+    document.getElementById('sfver').textContent =
+      `v${vers[0]?.version_tag||'?'} · ${vers.length} version(s)`;
+
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat" style="--c1:#3fb950">
+        <div class="stat-icon">💚</div>
+        <div class="stat-value" style="color:var(--green)">Online</div>
+        <div class="stat-label">API Status</div>
+        <div class="stat-change" style="color:var(--muted)">${h.service}</div>
+      </div>
+      <div class="stat" style="--c1:#58a6ff">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value" style="color:var(--accent)">${vers.length}</div>
+        <div class="stat-label">Document Versions</div>
+        <div class="stat-change" style="color:var(--muted)">${DOC}</div>
+      </div>
+      <div class="stat" style="--c1:#bc8cff">
+        <div class="stat-icon">🌲</div>
+        <div class="stat-value" style="color:var(--purple)">${totalNodes}</div>
+        <div class="stat-label">Total Nodes Parsed</div>
+        <div class="stat-change" style="color:var(--muted)">Across all versions</div>
+      </div>
+      <div class="stat" style="--c1:#d29922">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value" style="color:var(--yellow)">${changedNodes}</div>
+        <div class="stat-label">Change Detection</div>
+        <div class="stat-change" style="color:var(--muted)">Staleness tracking ON</div>
+      </div>`;
+
+    // Endpoint table
+    const endpoints = [
+      ['/health','GET',true],['/api/versions','GET',true],
+      ['/api/nodes','GET',true],['/api/search','GET',true],
+      ['/api/selections','GET/POST',true],['/api/generations','GET/POST',true],
+      ['/api/ingest','POST',true],['/dashboard','GET',true],
+    ];
+    document.getElementById('endpoint-table').innerHTML =
+      endpoints.map(([e,m,ok])=>`<tr>
+        <td><code style="color:var(--accent)">${e}</code></td>
+        <td><span class="badge badge-blue">${m}</span></td>
+        <td><span class="badge ${ok?'badge-green':'badge-red'}">${ok?'✓ Live':'✗ Down'}</span></td>
+      </tr>`).join('');
+
+    // Recent versions
+    document.getElementById('recent-versions').innerHTML = vers.map(v=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;
+        padding:10px 0;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-weight:600">Version ${v.version_tag}
+            ${v===vers[0]?'<span class="badge badge-green" style="margin-left:6px">LATEST</span>':''}
+          </div>
+          <div style="font-size:11px;color:var(--muted)">${v.file_name} · ${v.node_count} nodes</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted)">${new Date(v.ingested_at).toLocaleString()}</div>
+      </div>`).join('');
+  } catch(e){ document.getElementById('stats-grid').innerHTML = `<div class="empty-state">⚠ Could not connect to API: ${e.message}</div>`; }
+}
+
+// ══════════════════════════════════════════════════════════
+//  VERSIONS
+// ══════════════════════════════════════════════════════════
+async function loadVersions() {
+  const el = document.getElementById('versions-grid');
+  el.innerHTML = '<div class="loading-block"><span class="spinner"></span> Loading…</div>';
+  try {
+    const vers = await api('/api/versions?document_id='+DOC);
+    if(!vers.length){ el.innerHTML='<div class="empty-state"><div class="empty-icon">📦</div>No versions. Run e2e_demo.py first.</div>'; return; }
+    el.style.display='grid';
+    el.innerHTML = vers.map((v,i)=>`
+      <div class="version-card ${i===0?'latest':''}" onclick="showVersionNodes('${v.id}','${v.version_tag}')">
+        <div class="vc-top">
+          <div>
+            <div class="vc-ver">v${v.version_tag}</div>
+            <div class="vc-filename">📄 ${v.file_name}</div>
+          </div>
+          ${i===0?'<span class="badge badge-green">LATEST</span>':'<span class="badge badge-blue">v'+v.version_tag+'</span>'}
+        </div>
+        <div class="vc-stats">
+          <div class="vc-stat"><div class="vc-stat-val">${v.node_count}</div><div class="vc-stat-lbl">Nodes</div></div>
+          <div class="vc-stat"><div class="vc-stat-val">${v.id.slice(0,6).toUpperCase()}</div><div class="vc-stat-lbl">ID prefix</div></div>
+        </div>
+        <div class="vc-date">🕐 Ingested: ${new Date(v.ingested_at).toLocaleString()}</div>
+        <div style="margin-top:10px;font-size:12px;color:var(--accent)">Click to view nodes →</div>
+      </div>`).join('');
+    // Fill version dropdowns
+    const treeVer = document.getElementById('tree-ver');
+    treeVer.innerHTML = '<option value="">Latest</option>' +
+      vers.map(v=>`<option value="${v.version_tag}">v${v.version_tag}</option>`).join('');
+  } catch(e){ el.innerHTML='<div class="empty-state">Error: '+e.message+'</div>'; }
+}
+
+async function showVersionNodes(vid, vtag) {
+  const card = document.getElementById('version-nodes-card');
+  document.getElementById('version-nodes-title').textContent = `Nodes in version ${vtag}`;
+  card.style.display='block';
+  const list = document.getElementById('version-nodes-list');
+  list.innerHTML='<div class="loading-block"><span class="spinner"></span></div>';
+  try {
+    const nodes = await api('/api/nodes?document_id='+DOC+'&version_tag='+vtag);
+    document.getElementById('version-nodes-count').textContent = nodes.length+' nodes';
+    list.innerHTML = `<div class="scroll-list">`+nodes.slice(0,40).map(n=>`
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div>
+          <span class="badge ${['','badge-blue','badge-purple','badge-green'][n.level]||'badge-blue'}" style="margin-right:8px">H${n.level}</span>
+          <span style="font-size:13px">${n.heading}</span>
+        </div>
+        <span style="font-size:11px;color:var(--muted)">${n.logical_id}</span>
+      </div>`).join('')+'</div>';
+  } catch(e){ list.innerHTML='<div class="empty-state">'+e.message+'</div>'; }
+}
+
+// ══════════════════════════════════════════════════════════
+//  TREE
+// ══════════════════════════════════════════════════════════
+let treeFilter = 'all';
+async function loadTree() {
+  const el = document.getElementById('tree-list');
+  el.innerHTML='<div class="loading-block"><span class="spinner"></span> Loading…</div>';
+  const ver = document.getElementById('tree-ver').value;
+  const url = '/api/nodes?document_id='+DOC+(ver?'&version_tag='+ver:'');
+  try {
+    const nodes = await api(url);
+    allNodes = nodes;
+    renderTree();
+  } catch(e){ el.innerHTML='<div class="empty-state">'+e.message+'</div>'; }
+}
+
+function renderTree() {
+  const el = document.getElementById('tree-list');
+  const f = treeFilter;
+  const shown = f==='all' ? allNodes : allNodes.filter(n=>n.level==f);
+  if(!shown.length){ el.innerHTML='<div class="empty-state"><div class="empty-icon">🌲</div>No nodes to display.</div>'; return; }
+  el.innerHTML = shown.map(n=>nodeHTML(n)).join('');
+}
+
+function filterTree(f, btn) {
+  treeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTree();
+}
+
+function nodeHTML(n) {
+  const lvlClass = ['','l1','l2','l3'][n.level]||'l1';
+  const lvlColors={'l1':'-blue','l2':'-purple','l3':'-green'};
+  return `<div class="node" id="nd-${n.id}">
+    <div class="node-head" onclick="toggleNode('${n.id}')">
+      <div class="node-level ${lvlClass}">H${n.level}</div>
+      <div class="node-title">${n.heading}</div>
+      <div class="node-meta">
+        <span class="badge badge${lvlColors[lvlClass]||'-blue'}">${n.child_count} sub</span>
+        <span>${n.logical_id}</span>
+        <span class="expand-icon">▶</span>
+      </div>
+    </div>
+    <div class="node-body" id="nb-${n.id}">
+      <div class="loading-block"><span class="spinner"></span> Loading content…</div>
+    </div>
+  </div>`;
+}
+
+async function toggleNode(id) {
+  const nd = document.getElementById('nd-'+id);
+  nd.classList.toggle('open');
+  if(nd.classList.contains('open')) {
+    try {
+      const n = await api('/api/nodes/'+id);
+      const body = document.getElementById('nb-'+id);
+      body.innerHTML = `
+        <div class="body-text">${n.body_text || '<em style="color:var(--muted)">No body text for this section.</em>'}</div>
+        ${n.children.length?`
+          <div class="card-title" style="margin-bottom:8px">${n.children.length} Subsections</div>
+          <div class="children-list">
+            ${n.children.map(c=>`<div class="child-item">
+              <span><span class="badge badge-blue" style="margin-right:6px">H${c.level}</span>${c.heading}</span>
+              <span style="color:var(--muted);font-size:11px">${c.logical_id}</span>
+            </div>`).join('')}
+          </div>`:''}
+        <div class="hash-tag">SHA-256: ${n.content_hash}</div>`;
+    } catch(e){}
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  SEARCH
+// ══════════════════════════════════════════════════════════
+function qs(term){ document.getElementById('sq').value=term; doSearch(); }
+
+async function doSearch() {
+  const q = document.getElementById('sq').value.trim();
+  if(!q) return;
+  const el = document.getElementById('search-out');
+  el.innerHTML='<div class="loading-block"><span class="spinner"></span> Searching…</div>';
+  try {
+    const res = await api('/api/search?q='+encodeURIComponent(q)+'&document_id='+DOC);
+    if(!res.length){ el.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>No results for "'+q+'"</div>'; return; }
+    el.innerHTML = `<div style="color:var(--muted);font-size:12px;margin-bottom:12px">
+      ${res.length} result(s) for <strong style="color:var(--text)">"${q}"</strong></div>`
+      + res.map(n=>nodeHTML(n)).join('');
+  } catch(e){ el.innerHTML='<div class="empty-state">'+e.message+'</div>'; }
+}
+
+// ══════════════════════════════════════════════════════════
+//  TEST CASES
+// ══════════════════════════════════════════════════════════
+async function loadTestCases() {
+  const el = document.getElementById('tc-out');
+  el.innerHTML='<div class="loading-block"><span class="spinner"></span> Loading generations…</div>';
+  try {
+    const gens = await api('/api/generations');
+    if(!gens.length){
+      el.innerHTML=`<div class="empty-state">
+        <div class="empty-icon">🤖</div>
+        No test cases yet.<br/><br/>
+        <span style="color:var(--muted);font-size:12px">Run <code style="color:var(--accent)">python scripts/e2e_demo.py</code> to generate test cases.</span>
+      </div>`; return;
+    }
+    let html='';
+    for(const g of gens){
+      const detail = await api('/api/generations/'+g.generation_id);
+      const staleHTML = detail.is_stale ? `
+        <div class="stale-banner">
+          <div class="stale-banner-title">⚠ STALE — Source document changed after this generation</div>
+          ${detail.stale_nodes.map(sn=>`
+            <div class="stale-node-row">
+              <div>
+                <div style="font-weight:600;font-size:13px">${sn.heading}</div>
+                <div style="font-size:11px;color:var(--muted)">logical_id: ${sn.logical_id}</div>
+                <div class="diff-mono">${formatDiff(sn.diff_summary||'Content changed')}</div>
+              </div>
+              <span class="badge badge-red" style="flex-shrink:0">STALE</span>
+            </div>`).join('')}
+        </div>` : '';
+
+      const tcsHTML = detail.test_cases.map((tc,i)=>`
+        <div class="tc" id="tc-${g.generation_id}-${i}">
+          <div class="tc-top" onclick="toggleTC('tc-${g.generation_id}-${i}')">
+            <div>
+              <span class="tc-id-badge">${tc.id}</span>
+              <span class="tc-title-text">${tc.title}</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="badge badge-purple">QA Test</span>
+              <span style="color:var(--muted);font-size:18px">▶</span>
+            </div>
+          </div>
+          <div class="tc-detail">
+            <div class="tc-section">
+              <div class="tc-lbl">Requirement Reference</div>
+              <div class="tc-val" style="color:var(--accent)">📎 ${tc.requirement_ref}</div>
+            </div>
+            <div class="tc-section">
+              <div class="tc-lbl">Preconditions</div>
+              <div class="tc-val">${tc.preconditions}</div>
+            </div>
+            <div class="tc-section">
+              <div class="tc-lbl">Test Steps</div>
+              <div>${tc.steps.map((s,j)=>`<div class="step-item"><div class="step-num">${j+1}</div><div>${s}</div></div>`).join('')}</div>
+            </div>
+            <div class="tc-section">
+              <div class="tc-lbl">Expected Result</div>
+              <div class="expected-box">✓ ${tc.expected_result}</div>
+            </div>
+          </div>
+        </div>`).join('');
+
+      html += `
+        <div class="card" style="margin-bottom:20px">
+          <div class="gen-header">
+            <div>
+              <div style="font-size:11px;color:var(--muted)">Generation ID</div>
+              <div style="font-family:monospace;font-size:12px">${g.generation_id}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">
+                Created: ${new Date(g.created_at).toLocaleString()} &nbsp;·&nbsp;
+                Status: <span class="badge ${detail.status==='ok'?'badge-green':detail.status==='mock'?'badge-yellow':'badge-red'}">${detail.status}</span>
+              </div>
+            </div>
+            <span class="badge ${detail.is_stale?'badge-red':'badge-green'}" style="font-size:13px;padding:6px 14px">
+              ${detail.is_stale?'⚠ STALE':'✓ CURRENT'}
+            </span>
+          </div>
+          ${staleHTML}
+          ${tcsHTML || '<div class="empty-state">No test cases in this generation.</div>'}
+        </div>`;
+    }
+    el.innerHTML=html;
+  } catch(e){ el.innerHTML='<div class="empty-state">'+e.message+'</div>'; }
+}
+
+function toggleTC(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+function formatDiff(raw) {
+  return raw.split(/\\n/).map(l=>{
+    const esc = l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if(l.startsWith('+')&&!l.startsWith('+++')) return `<span class="diff-add">${esc}</span>`;
+    if(l.startsWith('-')&&!l.startsWith('---')) return `<span class="diff-rem">${esc}</span>`;
+    return `<span class="diff-ctx">${esc}</span>`;
+  }).join('\n');
+}
+
+// ══════════════════════════════════════════════════════════
+//  STALENESS DIFF
+// ══════════════════════════════════════════════════════════
+async function loadStaleness() {
+  const el = document.getElementById('diff-out');
+  el.innerHTML='<div class="loading-block"><span class="spinner"></span> Comparing versions…</div>';
+  try {
+    const vers = await api('/api/versions?document_id='+DOC);
+    if(vers.length<2){ el.innerHTML='<div class="empty-state"><div class="empty-icon">⚡</div>Need at least 2 versions. Run e2e_demo.py first.</div>'; return; }
+    const [latest, prev] = vers;
+    // Use the bulk diff endpoint which compares ALL nodes via logical_id matching
+    // (not just top-level nodes, which would miss nested section changes)
+    const changed = await api(`/api/diff?document_id=${DOC}&version_a=${prev.version_tag}&version_b=${latest.version_tag}`);
+    if(!changed.length){ el.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div>No differences found between versions.</div>'; return; }
+
+    el.innerHTML = `
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:20px">
+        <span class="badge badge-blue">v${prev.version_tag}</span>
+        <span style="color:var(--muted)">→</span>
+        <span class="badge badge-green">v${latest.version_tag}</span>
+        <span style="color:var(--muted);font-size:12px;margin-left:8px">${changed.length} section(s) changed</span>
+      </div>`
+    + changed.map(d=>`
+      <div class="diff-card">
+        <div class="diff-card-head">
+          <div>
+            <span class="badge badge-red" style="margin-right:10px">CHANGED</span>
+            <span class="heading">${d.heading}</span>
+          </div>
+          <span style="font-size:11px;color:var(--muted)">logical_id: ${d.logical_id}</span>
+        </div>
+        <div class="diff-block">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">
+            — v${d.version_a_tag} &nbsp;&nbsp; + v${d.version_b_tag}
+          </div>
+          <div class="diff-mono">${formatDiff(d.diff_summary||'Content changed')}</div>
+        </div>
+      </div>`).join('');
+  } catch(e){ el.innerHTML='<div class="empty-state">'+e.message+'</div>'; }
+}
+
+// ══════════════════════════════════════════════════════════
+//  INGEST
+// ══════════════════════════════════════════════════════════
+let chosenFile = null;
+
+function fileChosen(inp) {
+  chosenFile = inp.files[0];
+  if(chosenFile){
+    document.getElementById('file-chosen-name').style.display='block';
+    document.getElementById('file-chosen-name').textContent='📄 '+chosenFile.name;
+  }
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('file-drop').classList.remove('drag');
+  chosenFile = e.dataTransfer.files[0];
+  if(chosenFile){
+    document.getElementById('file-chosen-name').style.display='block';
+    document.getElementById('file-chosen-name').textContent='📄 '+chosenFile.name;
+  }
+}
+
+async function doIngest() {
+  const docId = document.getElementById('ing-doc').value.trim();
+  const verTag = document.getElementById('ing-ver').value.trim();
+  if(!docId||!verTag||!chosenFile){ toast('Please fill all fields and select a PDF','error'); return; }
+
+  const log = document.getElementById('ing-log');
+  const prog = document.getElementById('ing-progress');
+  const fill = document.getElementById('ing-fill');
+  log.style.display='block'; log.innerHTML='';
+  prog.style.display='block'; fill.style.width='10%';
+
+  function logLine(msg, cls='') { log.innerHTML+=`<div class="${cls}">${msg}</div>`; log.scrollTop=999; }
+
+  logLine(`Uploading ${chosenFile.name}…`);
+  fill.style.width='30%';
+
+  const fd = new FormData();
+  fd.append('file', chosenFile);
+  fd.append('document_id', docId);
+  fd.append('version_tag', verTag);
+
+  try {
+    const r = await fetch(B+'/api/ingest', {method:'POST', body:fd});
+    fill.style.width='80%';
+    const data = await r.json();
+    if(!r.ok) { logLine('ERROR: '+(data.detail||r.status), 'log-line-err'); fill.style.width='0'; toast(data.detail||'Ingest failed','error'); return; }
+    fill.style.width='100%';
+    logLine(`✓ Version ${data.version.version_tag} ingested successfully`);
+    logLine(`✓ Nodes extracted: ${data.version.node_count}`);
+    logLine(`✓ File: ${data.version.file_name}`);
+    toast('Ingested v'+data.version.version_tag+' — '+data.version.node_count+' nodes');
+    loadIngestVersions();
+    setTimeout(()=>{fill.style.width='0';prog.style.display='none';},1500);
+  } catch(e){ logLine('ERROR: '+e.message,'log-line-err'); toast(e.message,'error'); }
+}
+
+async function loadIngestVersions() {
+  const el = document.getElementById('ing-ver-list');
+  try {
+    const vers = await api('/api/versions?document_id='+DOC);
+    el.innerHTML = vers.map(v=>`
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div>
+          <span class="badge badge-blue" style="margin-right:8px">v${v.version_tag}</span>
+          <span style="font-size:12px;color:var(--muted)">${v.file_name}</span>
+        </div>
+        <span class="badge badge-green">${v.node_count} nodes</span>
+      </div>`).join('') || '<div class="empty-state">No versions yet.</div>';
+  } catch(e){}
+}
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+loadHealth();
+</script>
+</body>
+</html>

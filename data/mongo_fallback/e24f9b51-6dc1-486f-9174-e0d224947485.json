@@ -1,0 +1,48 @@
+{
+  "generation_id": "3079c9ad-a300-44b4-9151-0df587ad77bc",
+  "selection_id": "fd618b71-0a63-4c4c-a835-7ae1b091c274",
+  "status": "mock",
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "[MOCK] Verify normal operation",
+      "preconditions": "Device is powered on with fresh batteries.",
+      "steps": [
+        "Perform action 1",
+        "Observe result"
+      ],
+      "expected_result": "Device behaves as described in the manual.",
+      "requirement_ref": "2.2 Cuff Pressure Safety"
+    },
+    {
+      "id": "TC-002",
+      "title": "[MOCK] Verify error condition",
+      "preconditions": "Device is in error state.",
+      "steps": [
+        "Trigger error condition",
+        "Observe display"
+      ],
+      "expected_result": "Correct error code is displayed.",
+      "requirement_ref": "2.2 Cuff Pressure Safety"
+    },
+    {
+      "id": "TC-003",
+      "title": "[MOCK] Verify recovery",
+      "preconditions": "Error condition has been triggered.",
+      "steps": [
+        "Follow recovery steps",
+        "Attempt normal operation"
+      ],
+      "expected_result": "Device recovers and resumes normal operation.",
+      "requirement_ref": "2.2 Cuff Pressure Safety"
+    }
+  ],
+  "raw_llm_output": null,
+  "error_detail": "GROQ_API_KEY not set; returning mock output.",
+  "node_hashes": [
+    "3647c8010815e7add37e831124f433c9aa978c9e7802a047247f018cef1cedd5",
+    "dd745249b44b87e46f3a5590ddc7ce6cbec0370f97e5efc90607d6ee215f3645"
+  ],
+  "created_at": "2026-10-23T13:17:34.425957+00:00",
+  "_id": "e24f9b51-6dc1-486f-9174-e0d224947485"
+}
